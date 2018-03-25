@@ -47,32 +47,33 @@ function getDepartmentData(name){
 
 function calculateDraw(){
   /* calculate scale */
-  // var Ymax = d3.max(departmentData, function(d){return d.value}),
-  // Ymin = d3.min(departmentData, function(d){return d.value});
-  // $('rect').remove();
-  // $('text').remove();
 
-  // setTimeout(function() {
+  // d3.select("#text").select("svg").remove();
+  // d3.select("g").select("text").remove();
+  /*only select which has font-size attr text*/
+  d3.select("#yAxis").select("svg").remove();
+  $('text[font-family]').remove()
+  $('rect').remove();
+
+
+  setTimeout(function() {
 
     var xScale = d3.scale.linear()
     .domain(xData)
     .range([padding,w-padding])
 
     var yScale = d3.scale.linear()
-    .domain([yMin-1,yMax])
+    .domain([yMin,yMax])
     .range([padding, h-padding])
 
     var y = d3.scale.linear()
-    .domain([yMin-1,yMax])
+    .domain([yMin,yMax])
     .range([h-padding,padding])
 
     var colorScale = d3.scale.linear()
-    .domain([yMin-1,yMax])
-    .range([500,100])
+    .domain([yMin,yMax])
+    .range([500+yMax*2,100+yMin*1.5])
 
-    $('rect').remove();
-    $('text').remove();
-    
     /* append real x-y Axis*/
     svg.select("#xAxis").call(function(g){
       let axis = d3.svg.axis().scale(xScale).orient("bottom");
@@ -85,8 +86,6 @@ function calculateDraw(){
     });
 
     /* draw bar*/
-
-
     svg.selectAll('rect')
     .data(departmentData)
     .enter()
@@ -96,34 +95,39 @@ function calculateDraw(){
       'y': function(d) {return h-yScale(d.count)},
       'width': barWidth,
       'height': function(d){return yScale(d.count)-90},
-      'fill': function(d){var color = 0.2 + colorScale(d.count)*0.001;
-        return d3.hsl(512,color,color);},
-        // 'title': function(d){return 'Major:'+d.name;}
+      'fill': function(d){var color = 0.25 + colorScale(d.count)*0.00087;
+        return d3.hsl(197,0.67,color);},
       });
 
+      /*draw bar.attr*/
       svg.append("g").selectAll('text')
       .data(departmentData)
       .enter()
       .append('text')
       .text(function(d){return d.count+"人"})
       .attr({
-        'x': function(d,i) {return xScale(d.year)-(barWidth/10)},
-        'y': function(d) {return h-yScale(d.count)-5},
-        'fill': 'black',
+        'x': function(d,i) {return xScale(d.year)-(barWidth/10)+5},
+        'y': function(d) {return h-yScale(d.count)-12.5},
+        'font-family' : 'Microsoft JhengHei',
+        'fill': '	#6d6d6d',
         'text-anchor': 'middle',
-        'font-size': '50x'
+        'font-size': '50x',
+        'font-weight': 'bold'
       });
 
+      /*draw x-y label*/
       svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ (padding/6) +","+(h/2)+")rotate(-90)")  // text is drawn off the screen top left, move down and out and rotate
+      .attr({'font-size': '100x','font-family' : 'Microsoft JhengHei'})
       .text("人數變化");
 
       svg.append("text")
       .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
       .attr("transform", "translate("+ (w/2) +","+(h-(padding/2))+")")  // centre below axis
+      .attr({'font-size': '100x','font-family' : 'Microsoft JhengHei'})
       .text("年份(民國)");
 
-    // }, 200);
+    }, 14);
 
   }
